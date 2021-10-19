@@ -20,8 +20,7 @@
 
             <Button Click="OpenType" Margin="20 0"  Grid.Column="0">Marka</Button>
             <Button Click="OpenEngine"  Margin="10 0" Grid.Column="1">Silnik</Button>
-            <TextBox Margin="20 0" Grid.Column="2" IsReadOnly="True" Background="#eee" x:Name="price"/>
-            <Button Click="ShowPrice" Grid.Column="2" Grid.Row="1">Pokaż cenę</Button>
+            <TextBox Margin="20 0" Grid.Column="2" IsReadOnly="True" Background="#eee" x:Name="PriceTextBox" Text="{Binding Price.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </StackPanel>
 </Window>

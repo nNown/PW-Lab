@@ -12,24 +12,33 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
         <StackPanel Grid.Column="0" VerticalAlignment="Center">
             <StackPanel Margin="0 20">
-                <RadioButton Checked="TypeChecked">Benzyna</RadioButton>
-                <RadioButton Checked="TypeChecked">Olej</RadioButton>
-                <RadioButton Checked="TypeChecked">Gaz</RadioButton>
-                <RadioButton Checked="TypeChecked">Hybryda</RadioButton>
+                <ListView ItemsSource="{Binding EngineType, Mode=TwoWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Click="PriceChanged" GroupName="EngineType" IsChecked="{Binding IsChecked}" Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
             <StackPanel>
                 <Label>Moc</Label>
-                <ComboBox x:Name="PowerSelection" SelectedIndex="0" DropDownClosed="SelectedPower">
-                    <ComboBoxItem>100</ComboBoxItem>
-                    <ComboBoxItem>125</ComboBoxItem>
-                    <ComboBoxItem>150</ComboBoxItem>
-                    <ComboBoxItem>200</ComboBoxItem>
+                <ComboBox ItemsSource="{Binding Power, Mode=TwoWay}" DropDownClosed="PriceChanged" x:Name="PowerList">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <ComboBoxItem Content="{Binding Name}"></ComboBoxItem>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
                 </ComboBox>
             </StackPanel>
         </StackPanel>
-        <TextBox Grid.Column="1" Height="25" VerticalAlignment="Center" IsReadOnly="True" Background="#eee"></TextBox>
-        <Button Grid.Column="1" Height="25" VerticalAlignment="Center" Click="CloseWindow">Powrót</Button>
+        <TextBox Grid.Column="1" Grid.Row="0" Height="25" VerticalAlignment="Center" IsReadOnly="True" Background="#eee" x:Name="PriceTextBox"></TextBox>
+        <Button Grid.Column="1" Grid.Row="1" Height="25" VerticalAlignment="Center" Click="CloseWindow">Powrót</Button>
     </Grid>
 </Window>
