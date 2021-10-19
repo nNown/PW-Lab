@@ -1,0 +1,44 @@
+﻿<Window x:Class="WPF_Project.Type"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_Project"
+        mc:Ignorable="d"
+        Title="Type" Height="450" Width="800">
+    <Border Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <RadioButton IsChecked="True" Checked="TypeChecked">Fiat</RadioButton>
+                <RadioButton Checked="TypeChecked">Ford</RadioButton>
+                <RadioButton Checked="TypeChecked">Ferrarri</RadioButton>
+            </StackPanel>
+            <StackPanel Grid.Row="1">
+                <Label>Wyposażenie</Label>
+                <ListView ItemsSource="{Binding Equipment, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListView>
+            </StackPanel>
+            <StackPanel Grid.Row="2">
+                <Label>Polisa</Label>
+                <TextBox Text="{Binding Insurance, Mode=TwoWay}"  Width="150" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <Button Grid.Row="2" Grid.Column="1" Height="25" VerticalAlignment="Center" Click="CloseWindow">Powrót</Button>
+        </Grid>
+    </Border>
+</Window>
