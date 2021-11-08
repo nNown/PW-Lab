@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
+using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,78 +14,99 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Win32;
+using System.Drawing;
+using System.Collections;
 
-namespace PW_Lab3
+namespace PW_Lab4
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /// 
     public partial class MainWindow : Window
     {
-        public ObservableCollection<Row> TableData { get; set; }
+        public ObservableImage Image = new ObservableImage();
+
+        public static int MirroredProperty { get; set; }
+
+        public static int RotateProperty { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            TableData = new ObservableCollection<Row>();
+            DataContext = Image;
 
-            DataContext = this;
+            MirroredProperty = RotateProperty = 1;
         }
 
-        public void SaveCSV(object sender, EventArgs args) => SaveCSV();
-
-        public void LoadCSV(object sender, EventArgs args) => LoadCSV();
-
-        private void SaveCSV()
+        public void LoadImage(object sender, EventArgs args)
         {
-            var sb = new StringBuilder();
-
-            var headers = DataGrid.Columns.Cast<DataGridColumn>();
-            sb.AppendLine(string.Join(",", headers.Select(column => column.Header).ToArray()));
-
-            foreach(var row in DataGrid.Items)
-            {
-                if(row is Row rowData) 
-                {
-                    sb.AppendLine(string.Join(",", rowData.Name, rowData.Id, rowData.Count));
-                }
-            }
-
-            var dialog = new SaveFileDialog();
-            dialog.Filter = "CSV|*.csv";
-            dialog.Title = "Save an CSV file";
-
-            if(dialog.ShowDialog() ?? false)
-            {
-                using(StreamWriter sw = new StreamWriter(dialog.FileName))
-                {
-                    sw.Write(sb.ToString());
-                }
-            }
-        }
-
-        private void LoadCSV()
-        {
-            TableData.Clear();
-
             var dialog = new OpenFileDialog();
-            dialog.Filter = "CSV|*.csv";
-            dialog.Title = "Open an CSV file";
+            dialog.Filter = "BMP|*.bmp";
+            dialog.Title = "Open an Image file";
 
-            if(dialog.ShowDialog() ?? false)
+            if (dialog.ShowDialog() ?? false)
             {
-                using(StreamReader sr = new StreamReader(dialog.FileName))
-                {
-                    sr.ReadLine();
-                    while(sr.ReadLine() is string line)
-                    {
-                        var lineContent = line.Split(",");
-                        TableData.Add(new Row() { Name = lineContent[0], Id = lineContent[1], Count = Int32.Parse(lineContent[2]) });
-                    }
-                }
+                //Image.Image = new BitmapImage(new Uri(dialog.FileName));
+                Img.Source = new BitmapImage(new Uri(dialog.FileName));
             }
+        }
+
+        public void Mirror(object sender, EventArgs args)
+        {
+            if (Img.Source == null) return;
+
+            Img.RenderTransformOrigin = new Point(0.5, 0.5);
+            MirroredProperty *= -1;
+
+            ScaleTransform mirrorTransform = new ScaleTransform();
+            mirrorTransform.ScaleX = MirroredProperty;
+
+            Img.RenderTransform = mirrorTransform;
+        }
+
+        public void Rotate(object sender, EventArgs args)
+        {
+            if (Img.Source == null) return;
+            Img.RenderTransformOrigin = new Point(0.5, 0.5);
+
+            RotateTransform rotateTransform = new RotateTransform();
+            rotateTransform.Angle = RotateProperty++ * 90;
+
+            Img.RenderTransform = rotateTransform;
+        }
+
+        public void GreenOnly(object sender, EventArgs args)
+        {
+            if (Img.Source == null) return;
+
+            BitmapSource image = (BitmapSource) Img.Source;
+            int stride = (int) (image.PixelWidth * image.Format.BitsPerPixel / 8);
+            byte[] pixels = new byte[(int)image.PixelHeight * stride];
+            image.CopyPixels(pixels, stride, 0);
+
+            for(int i = 0, j = 2; j < pixels.Length; i += 4, j += 4)
+            {
+                pixels[i] = pixels[j] = 0;
+            }
+
+            Img.Source = BitmapSource.Create(image.PixelWidth, image.PixelHeight, image.DpiX, image.DpiY, image.Format, image.Palette, pixels, stride);
+        }
+
+        public void Negative(object sender, EventArgs args)
+        {
+            if (Img.Source == null) return;
+
+            BitmapSource image = (BitmapSource)Img.Source;
+            int stride = (int)(image.PixelWidth * image.Format.BitsPerPixel / 8);
+            byte[] pixels = new byte[(int)image.PixelHeight * stride];
+            image.CopyPixels(pixels, stride, 0);
+
+            for (var i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = (byte)(pixels[i] * -1);
+            }
+
+            Img.Source = BitmapSource.Create(image.PixelWidth, image.PixelHeight, image.DpiX, image.DpiY, image.Format, image.Palette, pixels, stride);
         }
     }
 }
