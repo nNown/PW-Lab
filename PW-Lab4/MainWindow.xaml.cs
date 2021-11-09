@@ -84,9 +84,9 @@ namespace PW_Lab4
             byte[] pixels = new byte[(int)image.PixelHeight * stride];
             image.CopyPixels(pixels, stride, 0);
 
-            for(var i = 0; i < pixels.Length; i+= 2)
+            for(int i = 0, j = 2; j < pixels.Length; i += 4, j += 4)
             {
-                pixels[i] = 0;
+                pixels[i] = pixels[j] = 0;
             }
 
             Img.Source = BitmapSource.Create(image.PixelWidth, image.PixelHeight, image.DpiX, image.DpiY, image.Format, image.Palette, pixels, stride);
