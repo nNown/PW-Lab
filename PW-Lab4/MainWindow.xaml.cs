@@ -1,7 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +15,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Drawing;
-using System.Collections;
 
 namespace PW_Lab4
 {
@@ -24,8 +23,6 @@ namespace PW_Lab4
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ObservableImage Image = new ObservableImage();
-
         public static int MirroredProperty { get; set; }
 
         public static int RotateProperty { get; set; }
@@ -33,8 +30,6 @@ namespace PW_Lab4
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = Image;
-
             MirroredProperty = RotateProperty = 1;
         }
 
@@ -55,7 +50,7 @@ namespace PW_Lab4
         {
             if (Img.Source == null) return;
 
-            Img.RenderTransformOrigin = new Point(0.5, 0.5);
+            Img.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
             MirroredProperty *= -1;
 
             ScaleTransform mirrorTransform = new ScaleTransform();
@@ -67,7 +62,7 @@ namespace PW_Lab4
         public void Rotate(object sender, EventArgs args)
         {
             if (Img.Source == null) return;
-            Img.RenderTransformOrigin = new Point(0.5, 0.5);
+            Img.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
 
             RotateTransform rotateTransform = new RotateTransform();
             rotateTransform.Angle = RotateProperty++ * 90;
@@ -78,18 +73,27 @@ namespace PW_Lab4
         public void GreenOnly(object sender, EventArgs args)
         {
             if (Img.Source == null) return;
-
-            BitmapSource image = (BitmapSource) Img.Source;
-            int stride = (int) (image.PixelWidth * image.Format.BitsPerPixel / 8);
-            byte[] pixels = new byte[(int)image.PixelHeight * stride];
-            image.CopyPixels(pixels, stride, 0);
-
-            for(int i = 0, j = 2; j < pixels.Length; i += 4, j += 4)
+            BitmapImage img = (BitmapImage)Img.Source;
+            Bitmap bitmap = ImageToBitmap(img);
+            for(int i = 0; i < bitmap.Height; i++)
             {
-                pixels[i] = pixels[j] = 0;
-            }
+                for(int j = 0; j < bitmap.Width; j++)
+                {
+                    System.Drawing.Color pixel = bitmap.GetPixel(j, i);
+                    int alpha = pixel.A;
+                    int red = pixel.R;
+                    int green = pixel.G;
+                    int blue = pixel.B;
 
-            Img.Source = BitmapSource.Create(image.PixelWidth, image.PixelHeight, image.DpiX, image.DpiY, image.Format, image.Palette, pixels, stride);
+                    if(red > 150 || blue > 150)
+                    {
+                        red = green = blue = 255;
+                    }
+
+                    bitmap.SetPixel(j, i, System.Drawing.Color.FromArgb(alpha, red, green, blue));
+                }
+            }
+            Img.Source = BitmapToImage(bitmap);
         }
 
         public void Negative(object sender, EventArgs args)
@@ -103,10 +107,36 @@ namespace PW_Lab4
 
             for (var i = 0; i < pixels.Length; i++)
             {
-                pixels[i] = (byte)(pixels[i] * -1);
+                pixels[i] = (byte)(255 - pixels[i]);
             }
 
             Img.Source = BitmapSource.Create(image.PixelWidth, image.PixelHeight, image.DpiX, image.DpiY, image.Format, image.Palette, pixels, stride);
+        }
+
+        private BitmapImage BitmapToImage(Bitmap img)
+        {
+            using (MemoryStream mr = new MemoryStream())
+            {
+                img.Save(mr, System.Drawing.Imaging.ImageFormat.Bmp);
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = mr;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                return bitmapImage;
+            }
+        }
+
+        private Bitmap ImageToBitmap(BitmapImage img)
+        {
+            using (MemoryStream mr = new MemoryStream())
+            {
+                BitmapEncoder bitmapEncoder = new BmpBitmapEncoder();
+                bitmapEncoder.Frames.Add(BitmapFrame.Create(img));
+                bitmapEncoder.Save(mr);
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(mr);
+                return new Bitmap(bitmap);
+            }
         }
     }
 }
