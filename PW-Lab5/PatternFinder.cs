@@ -21,21 +21,11 @@ namespace PW_Lab5
             return patterns;
         }
 
-        private static string Tag(string sequence, int start, int end)
-        {
-            var tag = string.Empty;
-            for(int i = start; i < end; i++)
-            {
-                tag += sequence[i];
-            }
-            return tag;
-        }
-
         private static IEnumerable<string> AllTags(string sequence, int length)
         {
             for(int i = 0; i < sequence.Length - length; i++)
             {
-                yield return Tag(sequence, i, i + length);
+                yield return sequence.Substring(i, length);
             }
         }
     }
