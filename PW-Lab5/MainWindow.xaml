@@ -1,0 +1,18 @@
+﻿<Window x:Class="PW_Lab5.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PW_Lab5"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Margin="10">
+            <Button Margin="0 10" Padding="5" Click="LoadSequence">Wczytaj Sekwencje</Button>
+            <Button Margin="0 10" Padding="5" Click="FindPatterns">Znajdź Wzorce</Button>
+            <ComboBox Name="DropDown" Margin="0 10" Padding="5" DropDownClosed="SelectPattern"></ComboBox>
+            <TextBox Name="Tags" Margin="0 10" Padding="5" Height="200"></TextBox>
+        </StackPanel>
+        <RichTextBox Name="Sequence" Margin="0 10" Width="600" IsReadOnly="True" Background="#eee"></RichTextBox>
+    </StackPanel>
+</Window>
