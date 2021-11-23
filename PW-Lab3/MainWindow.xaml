@@ -7,10 +7,22 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <StackPanel>
-        <DataGrid Name="DataGrid" ItemsSource="{Binding TableData, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+        <TextBox Margin="10 20" Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <DataGrid Name="Table" ItemsSource="{Binding TableData, Mode=TwoWay, NotifyOnSourceUpdated=True}" PreviewKeyDown="DeleteItem"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10">
             <Button Margin="10 0 5 0" Padding="10" Click="SaveCSV">Zapis do CSV</Button>
             <Button Margin="5 0 10 0" Padding="10" Click="LoadCSV">Odczyt z CSV</Button>
         </StackPanel>
+        <Popup Name="ExitConfirmation" Placement="Center">
+            <Border BorderThickness="1" BorderBrush="Black">
+                <StackPanel Background="White">
+                    <TextBlock Padding="20">Czy chcesz wyjść bez zapisania zmian?</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                        <Button Margin="10 0 5 0" Padding="10" Click="ConfirmExit">Tak</Button>
+                        <Button Margin="5 0 10 0" Padding="10" Click="ExitPopup">Nie</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
     </StackPanel>
 </Window>
