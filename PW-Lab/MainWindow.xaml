@@ -6,51 +6,20 @@
         xmlns:local="clr-namespace:PW_Lab"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="25">
-            <DataGrid Name="ReadersTableView" ItemsSource="{Binding ReadersTable, Mode=TwoWay, NotifyOnSourceUpdated=True}" AddingNewItem="AddNewReader" AutoGenerateColumns="False">
-                <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DodgerBlue"/>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=TwoWay}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Surname" Binding="{Binding Surname, Mode=TwoWay}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="LightGray"></Setter>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-            <StackPanel Margin="20">
-                <Button Padding="10 5" Margin="0 10" Click="LendBook">Wypożycz</Button>
-                <Button Padding="10 5" Margin="0 10" Click="ReturnBook">Oddaj</Button>
+    <StackPanel Margin="20" Orientation="Horizontal">
+        <StackPanel Margin="10 0">
+            <Label>Lista Lotnisk</Label>
+            <ListBox Padding="10 5" Name="AirportsList" ItemsSource="{Binding Airports}" DisplayMemberPath="AirportName"></ListBox>
+        </StackPanel>
+        <StackPanel Margin="10 0">
+            <StackPanel Margin="0 10">
+                <CheckBox Name="ICAOBox">Kod lotniska ICAO</CheckBox>
+                <CheckBox Name="IATABox">Kod lotniska IATA</CheckBox>
+                <CheckBox Name="PassengersBox">Liczba pasażerów</CheckBox>
+                <CheckBox Name="VoivodeshipBox">Województwo</CheckBox>
+                <CheckBox Name="CityBox">Miasto</CheckBox>
             </StackPanel>
-            <DataGrid Name="BooksTableView" ItemsSource="{Binding BooksTable, Mode=TwoWay, NotifyOnSourceUpdated=True}" AddingNewItem="AddNewBook" AutoGenerateColumns="False">
-                <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DodgerBlue"/>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Title" Binding="{Binding Title, Mode=TwoWay}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Author" Binding="{Binding Author, Mode=TwoWay}"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="LightGray"></Setter>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="ReaderId" Binding="{Binding ReaderId, Mode=TwoWay}" IsReadOnly="True">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="LightGray"></Setter>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+            <Button Click="LoadAiportDetails">Szczegóły</Button>
         </StackPanel>
     </StackPanel>
 </Window>

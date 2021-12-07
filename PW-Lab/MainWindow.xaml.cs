@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Xml.Serialization;
+using System.Linq;
+using Microsoft.VisualBasic.FileIO;
+using System.Collections.Generic;
 
 namespace PW_Lab
 {
@@ -15,140 +14,45 @@ namespace PW_Lab
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ObservableCollection<Reader> ReadersTable { get; set; } = new ObservableCollection<Reader>();
-
-        public ObservableCollection<Book> BooksTable { get; set; } = new ObservableCollection<Book>();
+        public ObservableCollection<Airport> Airports { get; set; } = new ObservableCollection<Airport>();
 
         public MainWindow()
         {
             InitializeComponent();
-            LoadState();
+            LoadAirports();
+
             DataContext = this;
         }
 
-        public void LendBook(object sender, EventArgs args)
-        {
-            if (!(BooksTableView.SelectedItem is Book book) || !(ReadersTableView.SelectedItem is Reader reader)) return;
-            if (book.ReaderId.HasValue) return;
+        private void LoadAirports()
+            => LoadCSV();
 
-            BooksTable.FirstOrDefault(selectedBook => selectedBook.Id == book.Id).ReaderId = reader.Id;
+        private void LoadAiportDetails(object sender, EventArgs args)
+        {
+            if (AirportsList.SelectedItem is not Airport selectedAirport) return;
+            string? ICAO = ICAOBox.IsChecked.Value ? selectedAirport.ICAO : null;
+            string? IATA = IATABox.IsChecked.Value ? selectedAirport.IATA : null;
+            string? PassengerCount = PassengersBox.IsChecked.Value ? selectedAirport.PassengerCount : null;
+            string? Voivodeship = VoivodeshipBox.IsChecked.Value ? selectedAirport.Voivodeship : null;
+            string? City = CityBox.IsChecked.Value ? selectedAirport.MainCity : null;
+            new AirportDetails(ICAO, IATA, PassengerCount, Voivodeship, City).Show();
         }
-
-        public void ReturnBook(object sender, EventArgs args)
+        private void LoadCSV()
         {
-            if (!(BooksTableView.SelectedItem is Book book)) return;
-            if (!book.ReaderId.HasValue) return;
+            Airports.Clear();
+            TextFieldParser parser = new TextFieldParser(Directory.GetCurrentDirectory() + "\\Test_Data.csv");
+            parser.HasFieldsEnclosedInQuotes = true;
+            parser.SetDelimiters(",");
+            string[] tokens;
 
-            BooksTable.FirstOrDefault(selectedBook => selectedBook.Id == book.Id).ReaderId = null;
-        }
-
-        public void AddNewReader(object sender, AddingNewItemEventArgs args)
-        {
-            args.NewItem = new Reader()
+            parser.ReadFields();
+            while(!parser.EndOfData)
             {
-                Name = string.Empty,
-                Surname = string.Empty,
-                Id = GenerateId(ReadersTable)
-            };
-        }
-
-        public void AddNewBook(object sender, AddingNewItemEventArgs args)
-        {
-            args.NewItem = new Book()
-            {
-                Title = string.Empty,
-                Author = string.Empty,
-                Id = GenerateId(BooksTable),
-                ReaderId = null
-            };
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            StoreState();
-            base.OnClosing(e);
-        }
-
-        private int GenerateId(IEnumerable<IGenericItem> collection)
-        {
-            var random = new Random();
-            int Id = random.Next(1, 1000);
-            while(collection.Any(item => item.Id == Id))
-                Id = random.Next(1, 1000);
-
-            return Id;
-        }
-
-        private void StoreState()
-        {
-            SaveReaders();
-            SaveBooks();
-        }
-
-        private void LoadState()
-        {
-            LoadReaders();
-            LoadBooks();
-        }
-
-        private void SaveReaders()
-        {
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(ReadersTable.GetType());
-
-                var directory = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\state");
-
-                using (FileStream stream = new FileStream(directory.FullName + "\\readers.xml", FileMode.Create))
-                {
-                    serializer.Serialize(stream, ReadersTable);
-                }
+                tokens = parser.ReadFields();
+                Airports.Add(new Airport() { MainCity = tokens[0], Voivodeship = tokens[1], ICAO = tokens[2], IATA = tokens[3], AirportName = tokens[4], PassengerCount = tokens[5], Increase = tokens[6] });
             }
-            catch { }
-        }
 
-        private void SaveBooks()
-        {
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(BooksTable.GetType());
-
-                var directory = Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\state");
-
-                using (FileStream stream = new FileStream(directory.FullName + "\\books.xml", FileMode.Create))
-                {
-                    serializer.Serialize(stream, BooksTable);
-                }
-            }
-            catch { }
-        }
-
-        private void LoadReaders()
-        {
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(ReadersTable.GetType());
-
-                using (FileStream stream = new FileStream(Directory.GetCurrentDirectory() + "\\state\\readers.xml", FileMode.Open))
-                {
-                    ReadersTable = (ObservableCollection<Reader>)serializer.Deserialize(stream);
-                }
-            }
-            catch { }
-        }
-
-        private void LoadBooks()
-        {
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(BooksTable.GetType());
-
-                using (FileStream stream = new FileStream(Directory.GetCurrentDirectory() + "\\state\\books.xml", FileMode.Open))
-                {
-                    BooksTable = (ObservableCollection<Book>)serializer.Deserialize(stream);
-                }
-            }
-            catch { }
+            parser.Close();
         }
     }   
 }
