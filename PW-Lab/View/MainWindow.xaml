@@ -1,0 +1,105 @@
+﻿<Window x:Class="PW_Lab.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PW_Lab.View"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Uczelnia:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding University, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Kierunek:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Course, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Studia w zakresie:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Degree, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Profil studiów:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Profile, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Forma studiów:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding CourseType, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Poziom studiów:</Label>
+                    <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding CourseLevel, Mode=TwoWay }"></TextBox>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" FontSize="10">Zobowiązuję/zobowiązujemy się samodzielnie wykonać pracę w zakresie wyspecyfikowanym niżej. Wszystkie elementy (m.in. rysunki, tabele, cytaty, programy komputerowe, urządzenia itp.), które zostaną wykorzystane w pracy, a nie będą mojego/naszego autorstwa będą w odpowiedni sposób zaznaczone i będzie podane źródło ich pochodzenia. 
+Jeżeli w wyniku realizacji pracy zostanie dokonany wynalazek, wzór użytkowy, wzór przemysłowy, znak towarowy, prawa do rozwiązań przysługiwać będą Politechnice Poznańskiej. Prawo to zostanie uregulowane odrębną umową.
+Oświadczam, iż o wyniku prac wskazanych powyżej, a także o innych, w tym tych, które mogą być przedmiotem tajemnicy Politechniki Poznańskiej, niezwłocznie powiadomię promotora pracy.
+Zobowiązuję się ponadto do zachowania w tajemnicy wszystkich informacji technicznych, technologicznych, organizacyjnych, uzyskanych w Politechnice Poznańskiej w okresie od daty rozpoczęcia realizacji prac do 5 lat od daty zakończenia wykonania prac.
+        </TextBlock>
+        <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Students, Mode=TwoWay}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Imie i Nazwisko" Binding="{Binding NameAndSurname, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Nr albumu" Binding="{Binding Id, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Data i podpis" Binding="{Binding DateAndSignature, Mode=TwoWay}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Tytuł pracy:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Title, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Wersja angielska tytułu:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding EnglishTitle, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Dane wejściowe:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding InputData, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Zakres pracy:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Scope, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Termin oddania pracy:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding DeliveryDate, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Promotor:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding Promoter, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Jednostka organizacyjna promotora:</Label>
+                <TextBox MinWidth="100" HorizontalAlignment="Right" Text="{Binding PromoterUnit, Mode=TwoWay }"></TextBox>
+            </StackPanel>
+        </StackPanel>
+        <Popup Name="SavePopup" Placement="Center">
+            <Border BorderThickness="1" BorderBrush="Black">
+                <StackPanel Background="White">
+                    <TextBlock Padding="20">Zapisać zmiany?</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                        <Button Margin="10 0 5 0" Padding="10" Click="SaveDataAndExit">Tak</Button>
+                        <Button Margin="5 0 10 0" Padding="10" Click="ExitWithoutSavingData">Nie</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+        <Popup Name="LoadPopup" Placement="Center">
+            <Border BorderThickness="1" BorderBrush="Black">
+                <StackPanel Background="White">
+                    <TextBlock Padding="20">Wczytać ostatni projekt?</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                        <Button Margin="10 0 5 0" Padding="10">Tak</Button>
+                        <Button Margin="5 0 10 0" Padding="10">Nie</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+    </StackPanel>
+</Window>
