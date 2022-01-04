@@ -1,37 +1,127 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace PW_Lab
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private MediaPlayer _mediaPlayer = new MediaPlayer();
+        private string _plainText;
+        private string _encryptedText;
+        private string _encryptionKey;
 
-        public ObservableCollection<string> MusicFiles { get; set; }
+        public string PlainText
+        {
+            get => _plainText;
+            set
+            {
+                _plainText = value;
+                Encrypt();
+                OnPropertyChanged();
+            }
+        }
+
+        public string EncryptedText
+        {
+            get => _encryptedText;
+            set
+            {
+                _encryptedText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string EncryptionKey
+        {
+            get => _encryptionKey;
+            set
+            {
+                if (value.Length > 16)
+                    return;
+
+                _encryptionKey = value;
+
+                Encrypt();
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow()
         {
             InitializeComponent();
+            _plainText = string.Empty;
+            _encryptedText = string.Empty;
 
-            string[] files = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\songs");
-            MusicFiles = new ObservableCollection<string>(files);
             DataContext = this;
         }
 
-        private void PlaySong(object sender, EventArgs args)
+        public void SaveData(object sender, EventArgs args)
         {
-            _mediaPlayer.Open(new Uri((string)MusicList.SelectedItem));
-            _mediaPlayer.Play();
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "txt|*.txt";
+            dialog.Title = "Open an text file";
+
+            if (dialog.ShowDialog() ?? false)
+                File.WriteAllText(dialog.FileName, EncryptedText);
+            
         }
 
-        private void StopSong(object sender, EventArgs args)
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        private void Encrypt()
         {
-            _mediaPlayer.Stop();
+            if (PlainText == null || PlainText.Length <= 0)
+                return;
+
+            if (EncryptionKey == null || EncryptionKey.Length < 16)
+                return;
+
+            byte[] encrypted;
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(EncryptionKey);
+                aesAlg.IV = Encoding.UTF8.GetBytes("supersecretivkey");
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(PlainText);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            }
+
+            EncryptedText = BitConverter.ToString(encrypted);
         }
     }
 }

@@ -6,11 +6,12 @@
         xmlns:local="clr-namespace:PW_Lab"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <StackPanel Orientation="Horizontal">
-        <StackPanel>
-            <Button Margin="10" Padding="10 5" Click="PlaySong">Play</Button>
-            <Button Margin="10" Padding="10 5" Click="StopSong">Stop</Button>
+    <StackPanel Margin="20 10">
+        <TextBox Padding="20 5" Text="{Binding PlainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"></TextBox>
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 15">
+            <TextBox Padding="20 5" Margin="20 5" Text="{Binding EncryptionKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Button Padding="20 5" Margin="20 5" Click="SaveData">Save</Button>
         </StackPanel>
-        <ListBox Margin="20 10" Padding="10 5" Name="MusicList" ItemsSource="{Binding MusicFiles}"></ListBox>
+        <TextBox Padding="20 5" IsReadOnly="True" Background="#eee" Text="{Binding EncryptedText, Mode=TwoWay}" TextWrapping="Wrap"></TextBox>
     </StackPanel>
 </Window>
