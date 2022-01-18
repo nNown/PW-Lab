@@ -6,12 +6,10 @@
         xmlns:local="clr-namespace:PW_Lab"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <StackPanel Margin="20 10">
-        <TextBox Padding="20 5" Text="{Binding PlainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"></TextBox>
-        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 15">
-            <TextBox Padding="20 5" Margin="20 5" Text="{Binding EncryptionKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <Button Padding="20 5" Margin="20 5" Click="SaveData">Save</Button>
-        </StackPanel>
-        <TextBox Padding="20 5" IsReadOnly="True" Background="#eee" Text="{Binding EncryptedText, Mode=TwoWay}" TextWrapping="Wrap"></TextBox>
+    <StackPanel HorizontalAlignment="Center" Margin="20">
+        <Label FontSize="36" Margin="0 0 0 10">Catcher</Label>
+        <ComboBox Name="AnimalsSelection" ItemsSource="{Binding Animals, Mode=TwoWay}" Margin="0 0 0 10"></ComboBox>
+        <ComboBox Name="DifficultySelection"  ItemsSource="{Binding Difficulty, Mode=TwoWay}" Margin="0 0 0 20"></ComboBox>
+        <Button FontSize="20" Padding="10 5" Click="StartGame">Start</Button>
     </StackPanel>
 </Window>

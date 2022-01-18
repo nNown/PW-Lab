@@ -1,11 +1,7 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,111 +13,52 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Xml.Serialization;
 
 namespace PW_Lab
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
-        private string _plainText;
-        private string _encryptedText;
-        private string _encryptionKey;
+        public ObservableCollection<string> Animals { get; set; } = new ObservableCollection<string>() { "Mysz", "Ryba", "Kot", "Krokodyl" };
 
-        public string PlainText
-        {
-            get => _plainText;
-            set
-            {
-                _plainText = value;
-                Encrypt();
-                OnPropertyChanged();
-            }
-        }
-
-        public string EncryptedText
-        {
-            get => _encryptedText;
-            set
-            {
-                _encryptedText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string EncryptionKey
-        {
-            get => _encryptionKey;
-            set
-            {
-                if (value.Length > 16)
-                    return;
-
-                _encryptionKey = value;
-
-                Encrypt();
-                OnPropertyChanged();
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ObservableCollection<string> Difficulty { get; set; } = new ObservableCollection<string>() { "Łatwy", "Średni", "Trudny" };
 
         public MainWindow()
         {
             InitializeComponent();
-            _plainText = string.Empty;
-            _encryptedText = string.Empty;
-
             DataContext = this;
         }
 
-        public void SaveData(object sender, EventArgs args)
+        public void StartGame(object sender, EventArgs args)
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = "txt|*.txt";
-            dialog.Title = "Open an text file";
-
-            if (dialog.ShowDialog() ?? false)
-                File.WriteAllText(dialog.FileName, EncryptedText);
-            
+            var difficulty = DifficultySelection.SelectedItem.ToString();
+            var animal = AnimalsSelection.SelectedItem.ToString();
+            Game game;
+            switch(difficulty)
+            {
+                case "Łatwy":
+                    game = new Game(0, animal, AnimalURL(animal));
+                    game.Show();
+                    break;
+                case "Średni":
+                    game = new Game(1, animal, AnimalURL(animal));
+                    game.Show();
+                    break;
+                case "Trudny":
+                    game = new Game(2, animal, AnimalURL(animal));
+                    game.Show();
+                    break;
+            }
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-        private void Encrypt()
+        private string AnimalURL(string selectedAnimal)
         {
-            if (PlainText == null || PlainText.Length <= 0)
-                return;
-
-            if (EncryptionKey == null || EncryptionKey.Length < 16)
-                return;
-
-            byte[] encrypted;
-
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Encoding.UTF8.GetBytes(EncryptionKey);
-                aesAlg.IV = Encoding.UTF8.GetBytes("supersecretivkey");
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(PlainText);
-                        }
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-
-            EncryptedText = BitConverter.ToString(encrypted);
+            if (selectedAnimal == "Mysz") return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/%D0%9C%D1%8B%D1%88%D1%8C_3.jpg/1200px-%D0%9C%D1%8B%D1%88%D1%8C_3.jpg";
+            else if (selectedAnimal == "Ryba") return "https://zasoby.ekologia.pl/artykulyNew/27426/xxl/shutterstock-1408036886_800x600.jpg";
+            else if (selectedAnimal == "Kot") return "https://www.zooplus.pl/magazyn/wp-content/uploads/2019/12/kot-przyb%C5%82%C4%99da-768x512.jpeg";
+            else return "https://fajnepodroze.pl/wp-content/uploads/2020/02/krokodyl.jpg";
         }
     }
 }
